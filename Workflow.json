@@ -1,0 +1,430 @@
+{
+  "name": "Generador de Reporte de Pagos",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1yipdlzuIqZTHmX3s6_cA1vRlbsKYVbtVHwiRI785akI",
+          "mode": "list",
+          "cachedResultName": "Ventas del Mes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yipdlzuIqZTHmX3s6_cA1vRlbsKYVbtVHwiRI785akI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 260461377,
+          "mode": "list",
+          "cachedResultName": "Horas_Empleados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yipdlzuIqZTHmX3s6_cA1vRlbsKYVbtVHwiRI785akI/edit#gid=260461377"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Estado"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1ec425a9-67b5-42cb-a944-1ce066793d7c",
+      "name": "Get Sheet Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -816,
+        0
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2UA8LbfSgV2ba6Cr",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "9219b736-8a04-4d47-a105-7ff7df2fb2a8",
+              "leftValue": "={{ $items().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4e1d8575-d947-4cbf-b787-7fa41d1c63cc",
+      "name": "Check Data Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const processedData = [];\n\nfor (const item of $input.all()) {\n    const row = item.json;\n\n  \n    const horas = parseFloat(row.Horas || 0);\n    const tarifa = parseFloat(row.Tarifa_Hora || 0);\n    \n    let pagoTotal = 0;\n    if (!isNaN(horas) && !isNaN(tarifa)) {\n        pagoTotal = horas * tarifa;\n    }\n    \n    const finalItem = {\n        ...row,\n        Pago_Total: pagoTotal \n    };\n    \n    processedData.push({ json: finalItem });\n}\n\nreturn processedData;"
+      },
+      "id": "f1267e6c-9cfd-4de9-974e-a47957e9dc60",
+      "name": "Process Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -496,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1yipdlzuIqZTHmX3s6_cA1vRlbsKYVbtVHwiRI785akI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Reporte_Pagos_Generado",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Empleado": "={{ $json.Empleado }}",
+            "Horas": "={{ $json.Horas }}",
+            "Tarifa_Hora": "={{ $json.Tarifa_Hora }}",
+            "Pago_Total": "={{ $json.Pago_Total }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Empleado",
+              "displayName": "Empleado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas",
+              "displayName": "Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tarifa_Hora",
+              "displayName": "Tarifa_Hora",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pago_Total",
+              "displayName": "Pago_Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "57f976cd-f4dd-4639-9388-0d269597dc3f",
+      "name": "Write Processed Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -320,
+        -192
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2UA8LbfSgV2ba6Cr",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e6e62c9d-44c9-45f9-bcae-5b517a70a283",
+              "name": "mensaje_resumen",
+              "value": "=El reporte de pagos se ha generado exitosamente para {{ $items().length - 2 }} empleados.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "82a63226-9fa2-47fd-8940-fd12edca767a",
+      "name": "Create Summary",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        48,
+        -192
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "86b108cc-5432-4f60-8348-75ac4f6310d6",
+      "name": "Log Completion",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -48
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "263594e1-5505-4a80-927b-d2e8cb8823ad",
+      "name": "Handle No Data",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1yipdlzuIqZTHmX3s6_cA1vRlbsKYVbtVHwiRI785akI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 260461377,
+          "mode": "list",
+          "cachedResultName": "Horas_Empleados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yipdlzuIqZTHmX3s6_cA1vRlbsKYVbtVHwiRI785akI/edit#gid=260461377"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Estado": "=REPORTADO",
+            "Empleado": "={{ $json.Empleado }}"
+          },
+          "matchingColumns": [
+            "Empleado"
+          ],
+          "schema": [
+            {
+              "id": "Empleado",
+              "displayName": "Empleado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horas",
+              "displayName": "Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tarifa_Hora",
+              "displayName": "Tarifa_Hora",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "f11e4a46-a2d4-4328-944d-166ec2f44cb4",
+      "name": "Mark Data As Reported",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -144,
+        -192
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2UA8LbfSgV2ba6Cr",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -976,
+        0
+      ],
+      "id": "e420beb4-944b-4669-8070-e364576b0874",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get Sheet Data": {
+      "main": [
+        [
+          {
+            "node": "Check Data Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Data Exists": {
+      "main": [
+        [
+          {
+            "node": "Process Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle No Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Data": {
+      "main": [
+        [
+          {
+            "node": "Write Processed Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Processed Data": {
+      "main": [
+        [
+          {
+            "node": "Mark Data As Reported",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Summary": {
+      "main": [
+        [
+          {
+            "node": "Log Completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Data As Reported": {
+      "main": [
+        [
+          {
+            "node": "Create Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Sheet Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "db83bc14-49bd-4aba-ab4c-f3a185b1f8b3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e48ed9dc7d901d6c23ce5cef0ac9a5d760c80669e7c12a6071ea96a71c0556fb"
+  },
+  "id": "Wyv8zebkSjElvqJT",
+  "tags": []
+}
