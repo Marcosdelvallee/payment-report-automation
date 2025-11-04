@@ -30,6 +30,6 @@ Este proyecto demuestra la habilidad para construir soluciones robustas de autom
 
 ![Diagrama del Workflow](Assets/Workflow.png)
 
-![Captura de la hoja de reporte final generada por el workflow](Assets/reporte_final_ejecucion.png)
-
 ![Hoja de origen mostrando la columna Estado actualizada a REPORTADO](Assets/origen_estado_actualizado.png)
+
+![Captura de la hoja de reporte final generada por el workflow](Assets/reporte_final_ejecucion.png)
