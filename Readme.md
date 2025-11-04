@@ -29,3 +29,7 @@ A robust, schedule-triggered workflow built to read new data, calculate payments
 Este proyecto demuestra la habilidad para construir soluciones robustas de automatización con control de integridad de datos. El sistema genera un reporte de pagos, calcula el total general del lote e implementa un mecanismo de **Control de Estado** para evitar la duplicación de pagos.
 
 ![Diagrama del Workflow](Assets/Workflow.png)
+
+![Captura de la hoja de reporte final generada por el workflow](Assets/reporte_final_ejecucion.png)
+
+![Hoja de origen mostrando la columna Estado actualizada a REPORTADO](Assets/origen_estado_actualizado.png)
